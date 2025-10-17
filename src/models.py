@@ -14,6 +14,12 @@ class User(db.Model):
         back_populates="user",
         cascade="all, delete-orphan",
         passive_deletes=True
+    )
+
+    def serialize(self):
+        return dict(
+            id=self.id,
+            email=self.email,
         )
 
 
@@ -25,17 +31,17 @@ class Favorite(db.Model):
         back_populates="favorite",
         cascade="all, delete-orphan",
         passive_deletes=True
-        )
+    )
     vehicles: Mapped[list["Vehicle"]] = relationship(
         back_populates="favorite",
         cascade="all, delete-orphan",
         passive_deletes=True
-        )
+    )
     planets: Mapped[list["Planet"]] = relationship(
         back_populates="favorite",
         cascade="all, delete-orphan",
         passive_deletes=True
-        )
+    )
 
 
 class Character(db.Model):
@@ -43,8 +49,17 @@ class Character(db.Model):
     name: Mapped[str] = mapped_column(String(120), unique=True, nullable=False)
     description: Mapped[str] = mapped_column(
         String(512), unique=True, nullable=False)
-    favorite_id: Mapped[int] = mapped_column(ForeignKey("favorite.id"))
+    favorite_id: Mapped[int | None] = mapped_column(
+        ForeignKey("favorite.id"), nullable=True)
     favorite: Mapped["Favorite"] = relationship(back_populates="characters")
+
+    def serialize(self):
+        return dict(
+            id=self.id,
+            name=self.name,
+            description=self.description,
+        )
+
 
 class Vehicle(db.Model):
     id: Mapped[int] = mapped_column(primary_key=True)
@@ -54,6 +69,14 @@ class Vehicle(db.Model):
     favorite_id: Mapped[int] = mapped_column(ForeignKey("favorite.id"))
     favorite: Mapped["Favorite"] = relationship(back_populates="vehicles")
 
+    def serialize(self):
+        return dict(
+            id=self.id,
+            name=self.name,
+            description=self.description,
+        )
+
+
 class Planet(db.Model):
     id: Mapped[int] = mapped_column(primary_key=True)
     name: Mapped[str] = mapped_column(String(120), unique=True, nullable=False)
@@ -61,4 +84,10 @@ class Planet(db.Model):
         String(512), unique=True, nullable=False)
     favorite_id: Mapped[int] = mapped_column(ForeignKey("favorite.id"))
     favorite: Mapped["Favorite"] = relationship(back_populates="planets")
-    
+
+    def serialize(self):
+        return dict(
+            id=self.id,
+            name=self.name,
+            description=self.description,
+        )
