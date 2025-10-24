@@ -9,7 +9,7 @@ from flask_cors import CORS
 from sqlalchemy import select
 from utils import APIException, generate_sitemap
 from admin import setup_admin
-from models import Character, db, User
+from models import Character, db, User, Planet, Vehicle, FavoriteList
 # from models import Person
 
 app = Flask(__name__)
@@ -60,12 +60,40 @@ def get_characters():
     return jsonify(characters_dictionaries), 200
 
 
-@app.route('/characters/<int:character_id>', methods=['GET'])
-def get_single_character(character_id: int):
-    character = db.session.get(Character, character_id)
-    if character is None:
-        return jsonify({"error": "character not found"}), 404
-    return jsonify(character.serialize()), 200
+@app.route('/planets', methods=['GET'])
+def get_planets():
+    planets = db.session.scalars(select(Planet)).all()
+    planets_dictionaries = []
+    for planet in planets:
+        planets_dictionaries.append(
+            planet.serialize()
+        )
+    return jsonify(planets_dictionaries), 200
+
+
+@app.route('/vehicles', methods=['GET'])
+def get_vehicles():
+    vehicles = db.session.scalars(select(Vehicle)).all()
+    vehicles_dictionaries = []
+    for vehicle in vehicles:
+        vehicles_dictionaries.append(
+            vehicle.serialize()
+        )
+    return jsonify(vehicles_dictionaries), 200
+
+
+@app.route('/favorite/planet/<int:planet_id>', methods=['POST'])
+def create_fav_planet(planet_id: int):
+    user_id = request.json.get("user_id", None)
+    if user_id is None:
+        return "User ID is required.", 400
+    favorite = FavoriteList(
+        id=planet_id,
+        user_id=user_id,
+    )
+    return jsonify(dict(
+        message="Added"
+    )), 200
 
 
 # this only runs if `$ python src/app.py` is executed

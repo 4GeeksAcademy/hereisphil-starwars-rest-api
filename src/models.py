@@ -45,6 +45,7 @@ class FavoriteList(db.Model):
             planets=self.planets.serialize() if self.planets is not None else None,
             charactesr=self.characters.serialize() if self.characters is not None else None,
             vehicles=self.vehicles.serialize() if self.vehicles is not None else None,
+            user=self.user.serialize() if self.user is not None else None,
         )
 
 
@@ -55,6 +56,13 @@ class Character(db.Model):
     )
     name: Mapped[str] = mapped_column(String(50), unique=True, nullable=False)
     description: Mapped[str] = mapped_column(String(255), nullable=False)
+
+    def serialize(self):
+        return {
+            "id": self.id,
+            "name": self.name,
+            "description": self.description,
+        }
 
 
 favorite_character = Table(
@@ -74,6 +82,13 @@ class Vehicle(db.Model):
     name: Mapped[str] = mapped_column(String(50), unique=True, nullable=False)
     description: Mapped[str] = mapped_column(String(255), nullable=False)
 
+    def serialize(self):
+        return {
+            "id": self.id,
+            "name": self.name,
+            "description": self.description,
+        }
+
 
 favorite_vehicle = Table(
     "favorite_vehicle",
@@ -91,6 +106,13 @@ class Planet(db.Model):
     )
     name: Mapped[str] = mapped_column(String(50), unique=True, nullable=False)
     description: Mapped[str] = mapped_column(String(255), nullable=False)
+
+    def serialize(self):
+        return {
+            "id": self.id,
+            "name": self.name,
+            "description": self.description,
+        }
 
 
 favorite_planet = Table(
